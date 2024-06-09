@@ -34,7 +34,7 @@ public:
         cin >> sec;
         cout << "\t\tRoll Number (XXXX): ";
         cin >> roll_no;
-        cout << "\n\nPlease make sure the details provided above must be appropriate.\n\tPress 'enter' to submit form or any other key to change the above details...";
+        cout << "\n\nPlease make sure the details provided above must be appropriate.\n\tPress 'enter' to submit form or any other key to change the above details...\n\n";
         c = _getch();
         if (c != 13) goto one;
     }
@@ -97,11 +97,22 @@ public:
         if (!check_file) check = false;
         check_file.close();
         fstream CSV_File;
-        if (!check) CSV_File.open(filename, ios::out);
-        else CSV_File.open(filename, ios::app);
-        if (!CSV_File) {
-            cout << "Error! Unable to access CSV file\n";
-            exit(0);
+        if (!check) {
+            CSV_File.open(filename, ios::out);
+            fstream unrec_file("C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\Files\\images.csv", ios::in);
+            if (!CSV_File || !unrec_file) {
+                cout << "Error! Unable to access images.\n";
+                exit(0);
+            }
+            string line;
+            while (getline(unrec_file, line)) CSV_File << line<<endl ;
+        }
+        else {
+            CSV_File.open(filename, ios::app);
+            if (!CSV_File) {
+                cout << "Error! Unable to access CSV file\n";
+                exit(0);
+            }
         }
         while (true) {
             camera >> frame;
@@ -113,7 +124,7 @@ public:
             equalizeHist(img_gary, img_gary); //Histogram equalization, which is helpful to improve the quality of pictures.
             face_cascade.detectMultiScale(img_gary, objects, 1.1, 3, 0, Size(50, 50));//Face detection
             for (size_t i = 0; i < objects.size(); i++)  rectangle(frame, objects[i], Scalar(0, 255, 0), 2);
-            if (frame_count % 5 == 0 && objects.size() == 1 && img_count <= 200) {
+            if (frame_count % 5 == 0 && objects.size() == 1 && img_count <= 150) {
                 faceImg = frame(objects[0]);
                 ret = save_img(faceImg, CSV_File, student.roll_no, img_count, img_label);
                 if (ret == 0) ++img_count;
@@ -122,6 +133,7 @@ public:
             resize(frame, desired_frame, Size(1500, 800), 0, 0);
             imshow("Scanning Face...", desired_frame);
         }
+        cout << "\nPlease wait..\n\n";
         destroyAllWindows();
         CSV_File.close();
         update_label();
@@ -172,16 +184,16 @@ int Add::save_img(Mat& faceIn, fstream& file, string roll_no, int  img_num, int&
     return 0;
 }
 void Add::set_instructions() {
-    if (img_count < 40) instructions = "Look stright.";
-    else if (img_count < 80) instructions = "Slightly move your head up.";
-    else if (img_count < 120) instructions = "Slightly move your head down.";
-    else if (img_count < 160) instructions = "Slightly turn left.";
-    else if (img_count < 200) instructions = "Slightly turn right.";
+    if (img_count < 30) instructions = "Look stright.";
+    else if (img_count < 60) instructions = "Slightly move your head up.";
+    else if (img_count < 90) instructions = "Slightly move your head down.";
+    else if (img_count < 120) instructions = "Slightly turn left.";
+    else if (img_count < 150) instructions = "Slightly turn right.";
     else instructions = "Press 'esc' to close..";
 }
-void Add::manage_frame_display() {
+void Add::manage_frame_display() { 
     set_instructions();
-    if (img_count <= 200) {
+    if (img_count <= 150) {
         if ((frame_count % 40) < 20) frame_text = "Scanning Face.";
         else if ((frame_count % 20) < 10) frame_text = "Scanning Face..";
         else frame_text = "Scanning Face...";
@@ -260,7 +272,7 @@ public:
 };
 
 static bool checkUsername(string a) {
-    const string login_info = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\Login Information.txt";
+    const string login_info = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\Files\\Login Information.txt";
     ifstream inFile(login_info, ios::in);
     if (!inFile) {
         cout << "\nError! Unable to access Log-In data.\n";
@@ -275,7 +287,7 @@ static bool checkUsername(string a) {
 }
 
 static bool login() {
-    const string login_info = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\Login Information.txt";
+    const string login_info = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\Files\\Login Information.txt";
     string un, pw;
     ifstream inFile(login_info, ios::in);
     if (!inFile) {
@@ -326,7 +338,7 @@ start2:
 }
 
 static bool signup() {
-    const string login_info = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\Login Information.txt";
+    const string login_info = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\Files\\Login Information.txt";
     string un, pw;
 
     ifstream File(login_info, ios::in);
@@ -440,17 +452,15 @@ public:
             }
     }
     void updateAttendencefile(const vector<Students>& students,const string sec) {
-        auto start = chrono::system_clock::now();
-        auto time = chrono::system_clock::to_time_t(start);
-        char buf[30];
-        ctime_s(buf, sizeof(buf), &time);
-        string date;
-        for (int i = 4; i < 11; i++) date.push_back(buf[i]);
-        int n = sizeof(buf);
-        date.push_back(' ');
-        date.push_back(',');
-        for (int i = n-4; i < n; i++) date.push_back(buf[i]);
-        string filename = attendance_path + sec + '(' + date + ").csv";
+        //auto start = chrono::system_clock::now();
+        //auto const time = chrono::system_clock::to_time_t(start);
+        //char buf[20];
+        //ctime_s(buf, sizeof(buf),&time);
+        //string date="";
+        //for (int i = 4; i < 11; i++) date.push_back(buf[i]);
+        //date.push_back(' ');
+        //date.push_back(',');
+        string filename = attendance_path + sec + " (9/6/24).csv";
         fstream attendance_file;
         attendance_file.open(filename, ios::out);
         if (!attendance_file) {
@@ -479,19 +489,18 @@ public:
 class FACE {
 public:
     bool isMatched = false;
-    int label = -1, pos_x = 0, pos_y = 0;
+    int label, pos_x = 0, pos_y = 0;
     double confidence = 0;
     Rect face_i;
     Mat face;
     Mat face_resized;
-
     FACE(FRAME& f, int index) {
         face_i = f.faces[index];
         face = f.graySacleFrame(face_i);
     }
     void highlightFace(FRAME& f) { rectangle(f.original, face_i, CV_RGB(0, 255, 0), 2); }
     void display_Face_Information(FRAME& f,const Students& student) const{
-        if (label != -1) putText(f.original, student.getName(), Point(pos_x+10, pos_y-10), FONT_HERSHEY_COMPLEX_SMALL, 1.0, CV_RGB(255, 0, 0), 1);
+        if (label == student.getFaceID()) putText(f.original, student.getName(), Point(pos_x + 10, pos_y - 5), FONT_HERSHEY_COMPLEX_SMALL, 1.0, CV_RGB(0, 153, 153), 1);
     }
     friend class FRAME;
     friend class FACERECOGNIZER;
@@ -500,10 +509,9 @@ public:
 class FACERECOGNIZER {
     const string student_data = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\All Sections\\Class Information [";
     const string class_trainer = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\Files\\recmodel ";
-    const string random_trainer = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\Files\\unrecmodel.xml";
-    const string video = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\VIDEOS\\bablu.mp4";
+    const string video = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\VIDEOS\\rage.mp4";
     const string DetectorFile = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT\\opencv\\haarcascade_frontalface_default.xml";
-    const string sample_image = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\Image data\\(1).jpg ";
+    const string sample_image = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\Image data\\ (1).jpg";
     const string window = "MRKING ATTENDENCE";
     Ptr<FaceRecognizer> model,model0;
     Attendance* studentAttendance;
@@ -512,7 +520,7 @@ class FACERECOGNIZER {
     CascadeClassifier face_cascade;
     VideoCapture cap;
     Mat testSample;
-    int recognized_faces_freq[100] = { 0 };
+    int img_width = 0, img_height = 0, recognized_faces_freq[100] = { 0 };
     string section;
     void set_section();
     void recognizeFace(FACE& f);
@@ -539,7 +547,7 @@ public:
                 goto here;
             }
         }
-        set_section();
+        set_section();//imread
         setallStudentsData();
         studentAttendance = new Attendance(students.size());
         if (!face_cascade.load(DetectorFile)) {
@@ -549,10 +557,9 @@ public:
         model = EigenFaceRecognizer::create();
         string filename = class_trainer + section + ".xml";
         model->read(filename);
-        model0->read(random_trainer);
         testSample = imread(sample_image, 0);
-        //img_width = testSample.cols;
-        //img_height = testSample.rows;
+        img_width = testSample.cols;
+        img_height = testSample.rows;
         cap.open(video);
         if (!cap.isOpened()) {
             cout << "\n\nError! Camera is not connected properly\n";
@@ -598,7 +605,7 @@ void FACERECOGNIZER::setallStudentsData() {
         }
         string word, name, roll, sec;
         stringstream check1(str);
-        int cnt = -1, label = -1;
+        int cnt = -1, label;
         bool status = true;
         while (getline(check1, word, ',')) {
             if (word == "Label") {
@@ -611,7 +618,6 @@ void FACERECOGNIZER::setallStudentsData() {
                 }
                 else break;
             }
-            cout << word << ' ';
             ++cnt;
             switch (cnt) {
             case 0: {
@@ -647,9 +653,12 @@ void FACERECOGNIZER::manageAttendence() {
     studentAttendance->updateAttendencefile(students,section);
 }
 void FACERECOGNIZER::recognizeFace(FACE& f){
-    resize(f.face, f.face_resized, Size(1500,800), 1.0, 1.0, INTER_CUBIC);
+    resize(f.face, f.face_resized, Size(img_width,img_height), 1.0, 1.0, INTER_CUBIC);
+    cout << "1: " << f.label << endl;
     model->predict(f.face_resized, f.label, f.confidence);
-    model0->predict(f.face_resized, f.label, f.confidence);
+    cout << "2: " << f.label << endl;
+    //model0->predict(f.face_resized, f.label, f.confidence);
+    //cout << "3: " << f.label << endl<<endl;
     if (f.label == -1) recognized_student = new Students();
     else {
         for (int i = 0; i < students.size(); i++) 
