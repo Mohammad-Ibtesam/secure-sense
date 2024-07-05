@@ -19,12 +19,12 @@ using namespace cv::face;
 using namespace std;
 
 string personfile, attendancefile;
-const string ImageFolder = "SecureSenseFiles/images/";
 const string DataFolder = "SecureSenseFiles/private/";
 const string RandomImageCSV = "SecureSenseFiles/private/images.csv";
 const string DataFile = "SecureSenseFiles/private/data.txt";
 const string loginfile = "SecureSenseFiles/private/login.txt";
 const string csvfile = "_image.csv", trainerfile = "_trainer.xml";
+const string face_detector = "SecureSenseFiles/private/haarcascade_frontalface_default.xml";
 
 class User {
     string username, password;
@@ -89,6 +89,7 @@ static bool signup(string u, string p) {
 
 bool CreateFiles(string path, int option = 0, string sec = "") {
 
+    for (int i = 0; i < sec.size(); i++) if (sec[i] == ' ') sec[i] = '_';
     for (int i = 0; i < path.size(); i++) if (path[i] == '\\') path[i] = '/';
 
     string occupation;
@@ -100,7 +101,7 @@ bool CreateFiles(string path, int option = 0, string sec = "") {
 
     fstream data_file(DataFile, ios::out);
     if (!data_file) return false;
-    data_file << "0\n" << sec << endl << occupation << endl << personfile << endl << attendancefile;
+    data_file << "0\n" << sec << endl << occupation << endl << personfile << endl << attendancefile << endl;
     data_file.close();
     return true;
 }
@@ -186,14 +187,14 @@ static string read_csv(const string& filename, vector<Mat>& images, vector<int>&
     return "";// to_string(images.size());
 }
 
-string generate_Trainer(string& sec) {
+string generate_Trainer(string sec) {
 here:
     string msg = "";
     vector<Mat> images;
     vector<int> labels; // load data
     bool test = true;
-    string filename = DataFolder + sec + csvfile;
-    const string trainer_name = DataFolder + sec + trainerfile;
+    string filename = "SecureSenseFiles/private/" + sec + csvfile;
+    const string trainer_name = "SecureSenseFiles/private/" + sec + trainerfile;
     msg = read_csv(filename, images, labels);
     if (msg != "") return msg;
     if (images.size() < 2) return "Insufficient number of images.";
@@ -216,6 +217,21 @@ here:
     return "";
 }
 
+int getMonthNumber(string a) {
+    if (a == "Jan") return 0;
+    else if (a == "Fab") return 1;
+    else if (a == "Mar") return 2;
+    else if (a == "Apr") return 3;
+    else if (a == "May") return 4;
+    else if (a == "Jun") return 5;
+    else if (a == "Jul") return 6;
+    else if (a == "Aug") return 7;
+    else if (a == "Sep") return 8;
+    else if (a == "Oct") return 9;
+    else if (a == "Nov") return 10;
+    else return 11;
+}
+
 class Student {
     string name, sec, roll_no, student_record;
 public:
@@ -227,14 +243,17 @@ public:
         fstream check_file(filename, ios::in);
         if (!check_file) check = false;
         check_file.close();
+        string sd, occ = getOccupation();
+        if (occ == "Student") sd = "Section";
+        else sd = "Deparmtment";
         fstream Student_File;
         if (!check) {
             Student_File.open(filename, ios::out);
-            Student_File << "\n,S.no,Roll no,Name,Sec,";
+            Student_File << "S.no,Roll no,Name,"<<sd<<",\n";
         }
         else Student_File.open(filename, ios::app);
         if (!Student_File) return "Unable to access " + getOccupation() + "s list.";
-        Student_File << "\r, " << img_label << ',' << roll_no << ',' << name << ',' << sec << ',';
+        Student_File << img_label << ',' << roll_no << ',' << name << ',' << sec << ",\n";
         Student_File.close();
         return "";
     }
@@ -242,7 +261,6 @@ public:
 };
 
 class Add {
-    const string face_detector = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT\\opencv\\haarcascade_frontalface_default.xml";
     string frame_text, instructions;
     int frame_count = 0, img_count = 1, img_label = -1;
     char key;
@@ -262,12 +280,12 @@ public:
 
 string Add::add(string name, string id, string sec) {
     student = new Student(name, id, sec);
-    camera.open("C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\VIDEOS\\fs.mp4"); //C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2/VIDEOS\\random.mp4"
+    camera.open(0);///////////////////////////////////////////////////"C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\VIDEOS\\fs.mp4"
     if (!camera.isOpened()) return "Unable to access camera.";
     bool checkfile = face_cascade.load(face_detector); //Load the face cascadeclassifier.
     if (!checkfile) return "Unable to access face detection file.";
     sec = getSection();
-    string filename = DataFolder + sec + csvfile;
+    string filename = "SecureSenseFiles/private/" + sec + csvfile;
     bool check = true;
     fstream check_file(filename, ios::in);
     if (!check_file) check = false;
@@ -312,7 +330,7 @@ string Add::add(string name, string id, string sec) {
     update_label();
     if (errormsg != "") return errormsg;
     student->save_student_data(img_label);
-    return generate_Trainer(sec);
+    return "";
 }
 
 string Add::update_label() {
@@ -338,13 +356,7 @@ int Add::save_img(Mat& faceIn, fstream& file, string roll_no, int  img_num, int&
     }
     if (faceIn.cols > 100) {
         resize(faceIn, faceOut, Size(92, 112)); //Resize and Keep a match with the train database.
-        /*string strname = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\Image data\\ ";//ImageFolder;
-        strname += roll_no;
-        strname += " (";
-        strname += to_string(img_num);
-        strname += ").jpg;";
-        strname += label;*/
-        string strname = format("%s\\ %s (%d).jpg", "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\image data", roll_no, img_num);
+        string strname = format("%s %s (%d).jpg", "SecureSenseFiles/images/", roll_no, img_num);
         if (label >= -1) file << strname << ";" << label << endl;
         bool isimagewritten = imwrite(strname, faceOut); //save image. Note the file suffix.
         if (!isimagewritten) {
@@ -403,30 +415,16 @@ public:
 };
 
 class Attendance {
-    bool* attendance;//tot
-    char* mark;//tot
+    string* mark;//tot
     const int frameLimit = 15;
-    string errormsg;
+    string errormsg,date, mon, yr = "20";;
+    int dd,mmm,yyyy;
 public:
-    Attendance(int cnt);
+    Attendance(vector<Students>& students);
+    bool isOnLeave(string id, int y, int m, int d);
     void markPresent(const vector<Students>& students, int freq[]);
     string updateAttendencefile(const vector<Students>& students, const string sec) {
-        auto start = chrono::system_clock::now();
-        auto const time = chrono::system_clock::to_time_t(start);
-        char buf[26];
-        ctime_s(buf, sizeof(buf), &time);
-        string date, yr;
-        for (int i = 4; i < 10; i++) date.push_back(buf[i]);
-        date[3] = '-';
-        if (date[9] != ' ') {
-            yr.push_back(buf[22]);
-            yr.push_back(buf[23]);
-        }
-        else {
-            yr.push_back(buf[21]);
-            yr.push_back(buf[22]);
-        }
-        string filename = getAttendanceFile() + date + "-20" + yr + ".csv";
+        string filename = getAttendanceFile() + date+ "-" + mon + "-" + yr + ".csv";
         fstream attendance_file;
         attendance_file.open(filename, ios::out);
         if (!attendance_file) return "Error! Unable to create attendence file.";
@@ -437,21 +435,67 @@ public:
     }
 };
 
-Attendance::Attendance(int cnt) {
-    attendance = new bool[cnt];
-    mark = new char[cnt];
-    for (int i = 0; i < cnt; i++) {
-        attendance[i] = false;
-        mark[i] = 'A';
+Attendance::Attendance(vector<Students>& students) {
+    auto start = chrono::system_clock::now();
+    auto const time = chrono::system_clock::to_time_t(start);
+    char buf[26];
+    ctime_s(buf, sizeof(buf), &time);
+    date.push_back(buf[8]);
+    date.push_back(buf[9]);
+    for (int i = 4; i < 7; i++) mon.push_back(buf[i]);
+    yr.push_back(buf[22]);
+    yr.push_back(buf[23]);
+    dd = stoi(date);
+    yyyy = stoi(yr);
+    mmm = getMonthNumber(mon);
+    mark = new string[students.size()];
+    for (int i = 0; i < students.size(); i++) {
+        if (isOnLeave(students[i].getID(), yyyy, mmm, dd)) mark[i] = "On-Leave";
+        else mark[i] = "Absent";
     }
 }
 
 void Attendance::markPresent(const vector<Students>& students, int freq[]) {
     for (int i = 0; i < students.size(); i++)
-        if (freq[students[i].getFaceID()] > frameLimit) {
-            attendance[i] = true;
-            mark[i] = 'P';
+        if (freq[students[i].getFaceID()] > frameLimit) mark[i] = "Present";
+}
+
+bool Attendance::isOnLeave(string id, int y, int m, int dt) {
+    string line;
+    fstream path_file(DataFile, ios::in);
+    if (!path_file) return false;
+    for (int i = 0; i < 5; i++) getline(path_file, line);
+    while (getline(path_file, line)) {
+        if (line.size() < 5) break;
+        stringstream record(line);
+        string word;
+        getline(record, word, ' ');
+        if (id == word) {
+            vector<int> d;
+            for (int i = 0; i < 6; i++) {
+                getline(record, word, ' ');
+                d.push_back(stoi(word));
+            }
+            if (d[0] > y || d[3] < y) return false;
+            else if (d[0] == y) {
+                if (d[1] > m) return false;
+                else if (d[1] == m) {
+                    if (d[2] > dt) return false;
+                    else return true;
+                }
+                else return true;
+            }
+            else if (d[3] == y) {
+                if (d[4] < m) return false;
+                else if (d[4] == m && d[2]< dt) return false;
+                else return true;
+            }
+            else return true;
         }
+        continue;
+    }
+    path_file.close();
+    return false;
 }
 
 class FRAME {
@@ -491,8 +535,7 @@ public:
 
 class FACERECOGNIZER {
     const string video = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\VIDEOS\\rage.mp4";
-    const string DetectorFile = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT\\opencv\\haarcascade_frontalface_default.xml";
-    const string sample_image = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\Image data\\ (1).jpg";
+    const string sample_image =/* "SecureSenseFiles/images/ (1).jpg";*/ "C:/Users/Afzaal Khan/Desktop/PROJECT/SecureSens/SecureSenseFiles/images/ (1).jpg";
     const string window = "MRKING ATTENDENCE";
     string errormsg = "";
     Ptr<FaceRecognizer> model;
@@ -513,15 +556,15 @@ public:
         section = getSection();
         errormsg = setallStudentsData();
         if (errormsg != "") return errormsg;
-        studentAttendance = new Attendance(students.size());
-        if (!face_cascade.load(DetectorFile)) return "ERROR! Unable to load detection file.";
+        studentAttendance = new Attendance(students);
+        if (!face_cascade.load(face_detector)) return "ERROR! Unable to load detection file.";
         model = EigenFaceRecognizer::create();
-        const string filename = DataFolder + section + trainerfile;
+        const string filename = "SecureSenseFiles/private/" + section + "_trainer.xml";
         model->read(filename);
         testSample = imread(sample_image, 0);
         img_width = testSample.cols;
         img_height = testSample.rows;
-        cap.open(video);
+        cap.open(0);////////////////////////////////////////
         if (!cap.isOpened()) return "Error! Camera is not connected properly.";
         namedWindow(window, 1);
         while (true) {
@@ -553,48 +596,19 @@ string FACERECOGNIZER::setallStudentsData() {
     fstream class_file(getPersonFile(), ios::in);
     if (!class_file)  return "Oops! This system is unable to mark attendance for section " + getSection() + '.';
     string str;
-    bool check = false;
-    while (getline(class_file, str, '\r')) {
-        if (!check) {
-            check = true;
-            continue;
-        }
-        string word, name, roll, sec;
+    getline(class_file, str);
+    while (getline(class_file, str)) {
         stringstream check1(str);
         int cnt = -1, label;
-        bool status = true;
-        while (getline(check1, word, ',')) {
-            if (word == "Label") {
-                break;
-            }
-            else if (word == "") {
-                if (status) {
-                    status = false;
-                    continue;
-                }
-                else break;
-            }
-            ++cnt;
-            switch (cnt) {
-            case 0: {
-                label = stoi(word);
-                break;
-            }
-            case 1: {
-                roll = word;
-                break;
-            }
-            case 2: {
-                name = word;
-                break;
-            }
-            case 3: {
-                sec = word;
-                break;
-            }
-            default: { break; }
-            }
-        }
+        string word, name, roll, sec;
+        getline(check1, word, ',');
+        label = stoi(word);
+        getline(check1, word, ',');
+        roll = word;
+        getline(check1, word, ',');
+        name = word;
+        getline(check1, word, ',');
+        sec = word;
         Students student(label, name, roll, sec);
         students.push_back(student);
     }
@@ -606,18 +620,6 @@ void FACERECOGNIZER::manageAttendence() {
     errormsg = studentAttendance->updateAttendencefile(students, section);
 }
 void FACERECOGNIZER::recognizeFace(FACE& f) {
-    /*resize(f.face, f.face_resized, Size(img_width, img_height), 1.0, 1.0, INTER_CUBIC);
-    model->predict(f.face_resized, f.label, f.confidence);
-    if (f.label != -1) {
-        for (int i = 0; i < students.size(); i++)
-            if (f.label == students[i].getFaceID()) {
-                recognized_student=new Students(students[i]);
-                ++recognized_faces_freq[f.label];
-            }
-    }
-    else recognized_student = new Students;
-    f.pos_x = max(f.face_i.tl().x - 10, 0);
-    f.pos_y = max(f.face_i.tl().y - 10, 0);*/
     resize(f.face, f.face_resized, Size(img_width, img_height), 1.0, 1.0, INTER_CUBIC);
     model->predict(f.face_resized, f.label, f.confidence);
     recognized_student = nullptr; // Ensure recognized_student is reset
@@ -645,6 +647,29 @@ string CaptureFace(string name, string id, string sec) {
     return faces.add(name, id, sec);
 }
 
+vector<string> returnAllIDs(){
+    string filename=getPersonFile();
+    fstream f(filename,ios::in);
+    vector<string> ids;
+    string record;
+    getline(f, record);
+    while (getline(f, record)) {
+        stringstream ss(record);
+        string word;
+        getline(ss, word, ',');
+        getline(ss, word, ',');
+        if (word != "") ids.push_back(word);
+    }
+    return ids;
+}
+
+bool setLeave(string ID, int yf, int yt, int mf, int mt, int df, int dt) {
+    fstream file(DataFile, ios::app);
+    if (!file) return false;
+    file << ID << ' ' << yf << ' ' << mf << ' ' << df << ' ' << yt << ' ' << mt << ' ' << dt <<' ' << endl;
+    file.close();
+    return true;
+}
 /*cout << "\tUsername: ";
 cin >> un;
 pw = "";

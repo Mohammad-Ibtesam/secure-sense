@@ -5,6 +5,8 @@
 #include <wx/datectrl.h>
 
 const wxString title = "Secure-Sens";
+wxIcon icon;
+wxIcon appIcon;
 
 class SetupFrame :public wxFrame {
 public:
@@ -65,6 +67,8 @@ public:
     inputdetailsframe(const wxString& title);
 private:
     void OnSubmitClicked(wxCommandEvent& event);
+    wxGauge* gauge;
+    wxTimer timer;
     wxBoxSizer* vbox;
     wxTextCtrl* namectrl;
     wxTextCtrl* rnoctrl;
@@ -76,8 +80,11 @@ class LeaveFrame : public wxFrame {
 public:
     LeaveFrame(const wxString& title);
 private:
+    void OnIDSelected(wxCommandEvent& event);
     void OnLeaveButton(wxCommandEvent& event);
-    wxTextCtrl* IDctrl;
+    wxChoice* IDctrl;
+    vector<string> IDS;
+    int index;
     wxDatePickerCtrl* datePicker;
     wxDatePickerCtrl* datePicker2;
     wxDECLARE_EVENT_TABLE();
@@ -106,7 +113,8 @@ enum {
     button_change_sec=11,
     button_leave=12,
     button_sec=13,
-    button_close=14
+    button_close=14,
+    ID_choose=15
 };
 
 wxBEGIN_EVENT_TABLE(SetupFrame, wxFrame)
@@ -138,6 +146,7 @@ wxEND_EVENT_TABLE()
 
 wxBEGIN_EVENT_TABLE(LeaveFrame, wxFrame)
 EVT_BUTTON(button_leave, LeaveFrame::OnLeaveButton)
+EVT_CHOICE(ID_choose, LeaveFrame::OnIDSelected)
 wxEND_EVENT_TABLE()
 
 wxBEGIN_EVENT_TABLE(ChangeSectionFrame, wxFrame)
@@ -153,11 +162,11 @@ wxIMPLEMENT_APP(SecureSens);
 
 bool SecureSens::OnInit() {
     if (isFirstAccount()) {
-        SignupFrame* signupFrame = new SignupFrame("Sign Up");
+        SignupFrame* signupFrame = new SignupFrame(title);
         signupFrame->Show(true);
     }
     else if (!isFirstAccount()) {
-        LoginFrame* loginFrame = new LoginFrame("Admin Login");
+        LoginFrame* loginFrame = new LoginFrame(title);
         loginFrame->Show(true);
     }
     return true;
@@ -169,6 +178,9 @@ LoginFrame::LoginFrame(const wxString& title): wxFrame(NULL, wxID_ANY, title, wx
     panel->SetBackgroundColour(wxColour(60, 60, 60));
     wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
     wxGridSizer* grid = new wxGridSizer(2,2,15,15);
+    icon.LoadFile("favicon.ico", wxBITMAP_TYPE_ICO);
+    appIcon.CopyFromBitmap(icon);
+    SetIcon(appIcon);
 
     wxStaticText* placeholderlabel0 = new wxStaticText(panel, wxID_ANY, "", wxDefaultPosition, wxSize(60, 30));
     wxStaticText* placeholderlabel1 = new wxStaticText(panel, wxID_ANY, "", wxDefaultPosition, wxSize(60, 30));
@@ -237,6 +249,10 @@ SignupFrame::SignupFrame(const wxString& title): wxFrame(NULL, wxID_ANY, title, 
     panel->SetBackgroundColour(wxColour(60, 60, 60));
     wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
     grid = new wxGridSizer(2, 2, 15, 15);
+    icon.LoadFile("favicon.ico", wxBITMAP_TYPE_ICO);
+    appIcon.CopyFromBitmap(icon);
+    SetIcon(appIcon);
+
     wxStaticText* placeholderlabel0 = new wxStaticText(panel, wxID_ANY, "", wxDefaultPosition, wxSize(60, 30));
     wxStaticText* placeholderlabel1 = new wxStaticText(panel, wxID_ANY, "",wxDefaultPosition, wxSize(60, 30));
     wxStaticText* placeholderlabel2 = new wxStaticText(panel, wxID_ANY, "Signning Up",wxPoint(150,30), wxSize(200, 40));
@@ -318,6 +334,8 @@ inputdetailsframe::inputdetailsframe(const wxString& title) : wxFrame(NULL, wxID
     this->SetBackgroundColour(wxColour(0, 0, 0));
     panel->SetBackgroundColour(wxColour(60, 60, 60));
     wxGridSizer* grid = new wxGridSizer(2, 2, 15, 15);
+    appIcon.CopyFromBitmap(icon);
+    SetIcon(appIcon);
 
     wxString sd,sec(getSection()), occupation(getOccupation());
     if (occupation == "Student") sd = "Section:";
@@ -349,7 +367,7 @@ inputdetailsframe::inputdetailsframe(const wxString& title) : wxFrame(NULL, wxID
     idlabel->SetForegroundColour(wxColour(255, 255, 255));
     idlabel->SetBackgroundColour(wxColour(60, 60, 60));
 
-    wxStaticText* seclabel = new wxStaticText(panel, wxID_ANY, occupation + "\'s "+sd+" (optional):", wxDefaultPosition, wxSize(150, 20));
+    wxStaticText* seclabel = new wxStaticText(panel, wxID_ANY, occupation + "\'s "+sd+" (optional):", wxDefaultPosition, wxSize(200, 20));
     seclabel->SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_MEDIUM));
     seclabel->SetForegroundColour(wxColour(255, 255, 255));
     seclabel->SetBackgroundColour(wxColour(60, 60, 60));
@@ -371,7 +389,6 @@ inputdetailsframe::inputdetailsframe(const wxString& title) : wxFrame(NULL, wxID
     secctrl->SetToolTip(wxT("Section/Department name"));
     secctrl->SetForegroundColour(wxColour(200, 200, 200));
     secctrl->SetBackgroundColour(wxColour(0, 0, 0));
-
 
     grid->Add(placeholderlabel0, 1, wxALIGN_RIGHT);
     grid->Add(placeholderlabel1, 1, wxALIGN_LEFT);
@@ -405,6 +422,8 @@ SetupFrame::SetupFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title, w
     panel->SetBackgroundColour(wxColour(60, 60, 60));
     wxGridSizer* grid = new wxGridSizer(2, 2, 15, 15);
     vbox = new wxBoxSizer(wxVERTICAL);
+    appIcon.CopyFromBitmap(icon);
+    SetIcon(appIcon);
 
     wxStaticText* labell = new wxStaticText(panel, wxID_ANY, "Using for:", wxDefaultPosition, wxSize(120, 20));
     labell->SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_MEDIUM));
@@ -416,7 +435,7 @@ SetupFrame::SetupFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title, w
     DIRLABEL->SetForegroundColour(wxColour(255, 255, 255));
     DIRLABEL->SetBackgroundColour(wxColour(60, 60, 60));
 
-    inputLabel = new wxStaticText(panel, wxID_ANY, "", wxDefaultPosition, wxSize(180, 20));
+    inputLabel = new wxStaticText(panel, wxID_ANY, "", wxDefaultPosition, wxSize(220, 20));
     inputLabel->SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_MEDIUM));
     inputLabel->SetForegroundColour(wxColour(255, 255, 255));
     inputLabel->SetBackgroundColour(wxColour(60, 60, 60));
@@ -471,7 +490,7 @@ SetupFrame::SetupFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title, w
     grid->Add(placeholderlabel6, 1, wxALIGN_LEFT);
     grid->Add(m_dirPathCtrl, 1,wxCENTER);
 
-    wxButton* browseButton = new wxButton(panel, button_browse, "Browse", wxDefaultPosition, wxSize(90, 30));
+    wxButton* browseButton = new wxButton(panel, button_browse, "Browse", wxDefaultPosition, wxSize(100, 30));
     browseButton->SetFont(wxFont(11, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
     browseButton->SetToolTip(wxT("Browse Folder"));
     browseButton->SetBackgroundColour(wxColour(60, 60, 60));
@@ -480,7 +499,7 @@ SetupFrame::SetupFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title, w
     grid->Add(placeholderlabel7, 1, wxALIGN_RIGHT);
     grid->Add(placeholderlabel8, 1, wxALIGN_LEFT);
 
-    wxButton* confirmButton = new wxButton(panel, button_confirm, "Confirm", wxDefaultPosition, wxSize(90, 30));
+    wxButton* confirmButton = new wxButton(panel, button_confirm, "Confirm", wxDefaultPosition, wxSize(110, 30));
     confirmButton->SetFont(wxFont(11, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
     confirmButton->SetToolTip(wxT("Confirm"));
     confirmButton->SetBackgroundColour(wxColour(60, 60, 60));
@@ -496,6 +515,8 @@ mainframe::mainframe(const wxString& title) : wxFrame(NULL, wxID_ANY, title, wxP
     panel->SetBackgroundColour(wxColour(60, 60, 60));
     wxGridSizer* grid = new wxGridSizer(2, 1, 15, 15);
     wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+    appIcon.CopyFromBitmap(icon);
+    SetIcon(appIcon);
 
     wxString sd, occupation(getOccupation());
     if (occupation == "Student") sd = "section";
@@ -518,7 +539,7 @@ mainframe::mainframe(const wxString& title) : wxFrame(NULL, wxID_ANY, title, wxP
     start->SetBackgroundColour(wxColour(60, 60, 60));
     start->SetForegroundColour(wxColour(60, 255, 0));
 
-    wxButton* addButton = new wxButton(panel, button_addface, "Capture new face" ,wxDefaultPosition,wxSize(150,30));
+    wxButton* addButton = new wxButton(panel, button_addface, "Capture new face" ,wxDefaultPosition,wxSize(160,30));
     addButton->SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
     addButton->SetToolTip(wxT("Add face"));
     addButton->SetBackgroundColour(wxColour(60, 60, 60));
@@ -530,7 +551,7 @@ mainframe::mainframe(const wxString& title) : wxFrame(NULL, wxID_ANY, title, wxP
     newacc->SetBackgroundColour(wxColour(60, 60, 60));
     newacc->SetForegroundColour(wxColour(60, 255, 0));
 
-    wxButton* changesec = new wxButton(panel, button_change_sec, "Change "+sd, wxDefaultPosition, wxSize(150, 30));
+    wxButton* changesec = new wxButton(panel, button_change_sec, "Change "+sd, wxDefaultPosition, wxSize(230, 30));
     changesec->SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
     changesec->SetToolTip(wxT("Chane"));
     changesec->SetBackgroundColour(wxColour(60, 60, 60));
@@ -542,7 +563,7 @@ mainframe::mainframe(const wxString& title) : wxFrame(NULL, wxID_ANY, title, wxP
     appointleave->SetBackgroundColour(wxColour(60, 60, 60));
     appointleave->SetForegroundColour(wxColour(60, 255, 0));
 
-    wxButton* close = new wxButton(panel, button_close, "Close", wxDefaultPosition, wxSize(60, 30));
+    wxButton* close = new wxButton(panel, button_close, "Close", wxDefaultPosition, wxSize(90, 30));
     close->SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
     close->SetToolTip(wxT("Close"));
     close->SetBackgroundColour(wxColour(60, 60, 60));
@@ -556,11 +577,11 @@ mainframe::mainframe(const wxString& title) : wxFrame(NULL, wxID_ANY, title, wxP
     grid->Add(placeholderlabel1, 0, wxALIGN_CENTER);
     grid->Add(addButton, 0, wxALIGN_CENTER);
     grid->Add(placeholderlabel4, 0, wxALIGN_CENTER);
-    grid->Add(appointleave, 0, wxALIGN_CENTER );
+    grid->Add(newacc, 0, wxALIGN_CENTER);
     grid->Add(placeholderlabel4, 0, wxALIGN_CENTER);
     grid->Add(changesec, 0, wxALIGN_CENTER);
     grid->Add(placeholderlabel4, 0, wxALIGN_CENTER);
-    grid->Add(newacc, 0, wxALIGN_CENTER );
+    grid->Add(appointleave, 0, wxALIGN_CENTER );
     grid->Add(placeholderlabel4, 0, wxALIGN_CENTER);
     grid->Add(close, 0, wxALIGN_CENTER|wxALL);
     panel->SetSizer(vbox);
@@ -572,10 +593,12 @@ LeaveFrame::LeaveFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title, w
     panel->SetBackgroundColour(wxColour(60, 60, 60));
     wxGridSizer* grid = new wxGridSizer(2, 2, 15, 15);
     wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+    appIcon.CopyFromBitmap(icon);
+    SetIcon(appIcon);
 
     wxString occupation(getOccupation());
 
-    wxStaticText* idlabel = new wxStaticText(panel, wxID_ANY, occupation + "\'s ID:", wxDefaultPosition, wxSize(100, 20));
+    wxStaticText* idlabel = new wxStaticText(panel, wxID_ANY, occupation + "\'s ID:", wxDefaultPosition, wxSize(180, 20));
     idlabel->SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_MEDIUM));
     idlabel->SetForegroundColour(wxColour(255, 255, 255));
     idlabel->SetBackgroundColour(wxColour(60, 60, 60));
@@ -593,9 +616,16 @@ LeaveFrame::LeaveFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title, w
     placeholderlabel3->SetForegroundColour(wxColour(255, 255, 255));
     placeholderlabel3->SetBackgroundColour(wxColour(60, 60, 60));
     
-    IDctrl = new wxTextCtrl(panel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(120, 30));
+    wxArrayString ids;
+    IDS = returnAllIDs();
+    for (int i = 0; i < IDS.size(); i++) {
+        wxString id(IDS[i]);
+        ids.Add(id);
+    }
+
+    IDctrl = new wxChoice(panel, ID_choose, wxDefaultPosition, wxSize(120, 30),ids);
     IDctrl->SetFont(wxFont(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_MEDIUM));
-    IDctrl->SetToolTip(wxT("Section/Department name"));
+    IDctrl->SetToolTip(wxT("ID"));
     IDctrl->SetForegroundColour(wxColour(200, 200, 200));
     IDctrl->SetBackgroundColour(wxColour(0, 0, 0));
     
@@ -622,7 +652,7 @@ LeaveFrame::LeaveFrame(const wxString& title) : wxFrame(NULL, wxID_ANY, title, w
     grid->Add(placeholderlabel4, 1, wxALIGN_RIGHT);
     grid->Add(placeholderlabel5, 1, wxALIGN_LEFT);
     
-    wxButton* LeaveButton = new wxButton(panel, button_leave, "Mark Leave", wxDefaultPosition, wxSize(100, 30));
+    wxButton* LeaveButton = new wxButton(panel, button_leave, "Mark Leave", wxDefaultPosition, wxSize(120, 30));
     LeaveButton->SetFont(wxFont(11, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD));
     LeaveButton->SetToolTip(wxT("Mark Leave"));
     LeaveButton->SetBackgroundColour(wxColour(60, 60, 60));
@@ -638,6 +668,8 @@ ChangeSectionFrame::ChangeSectionFrame(const wxString& title) : wxFrame(NULL, wx
     panel->SetBackgroundColour(wxColour(60, 60, 60));
     wxGridSizer* grid = new wxGridSizer(2, 2, 15, 15);
     wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
+    appIcon.CopyFromBitmap(icon);
+    SetIcon(appIcon);
 
     wxString sd, occupation(getOccupation());
     if (occupation == "Student") sd = "Section";
@@ -679,29 +711,46 @@ ChangeSectionFrame::ChangeSectionFrame(const wxString& title) : wxFrame(NULL, wx
 
 void inputdetailsframe::OnSubmitClicked(wxCommandEvent& event) {
     wxString name = namectrl->GetValue(), id = rnoctrl->GetValue(), sec = secctrl->GetValue();
+    wxString section = sec;
     for (int i = 0; i < name.size(); i++) if (!((name[i] >= 65 && name[i] <= 90) || (name[i] >= 97 && name[i] <= 122) || (name[i] = ' '))) wxMessageBox("Please type fullname properly.", "Stop", wxOK | wxICON_STOP);
     if (name.size()<3) wxMessageBox("Please type fullname.", "Stop", wxOK | wxICON_STOP);
     else if (id == "") wxMessageBox("Please type ID.", "Stop", wxOK | wxICON_STOP);
     else {
-        wxMessageDialog dialog(this, "Are the details provided above appropriate?", "Confirmation", wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION);
+        wxMessageDialog dialog(this, "Are the details provided above appropriate?", "Ask", wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION);
         if (dialog.ShowModal() == wxID_YES) {
-            this->Close();
             wxString error(CaptureFace(name.ToStdString(), id.ToStdString(), sec.ToStdString()));
             if (error != "") wxMessageBox(error, "Error", wxOK | wxICON_STOP);
-            else wxMessageBox("Face scanned successfully.", "Done.", wxOK);
+            else {
+                wxMessageDialog dialog2(this, "Scanning completed. Do you want to scan another face?", "Ask", wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION);
+                if (dialog2.ShowModal() == wxID_YES) {
+                    wxString s;
+                    string o = getOccupation();
+                    if (o == "Employee") s = "Department";
+                    else s = "Section";
+                    wxMessageBox("Please make sure the " + s + " name must be same in order to avoid mismanagement.", "Scanning Multiple Faces", wxOK | wxICON_WARNING);
+                }
+                else {
+                    this->Close();
+                    wxMessageDialog dialog3(this, "Do not close the application. Please wait...", "Processing..");
+                    error = generate_Trainer(section.ToStdString());
+                    dialog3.Close();
+                    if (error != "") wxMessageBox(error, "Error", wxOK | wxICON_STOP);
+                    else wxMessageBox("Ready to perform face recognition.", "Done", wxOK);
+                }
+            } 
         }
     }
 }
-
+    
 void SetupFrame::Onconfirmclicked(wxCommandEvent& event) {
    wxString sec = inputCtrl->GetValue();
     int option = choice->GetSelection();
-    if(option==wxNOT_FOUND) wxMessageBox("Please select the place where you want to use this application.", "Stop", wxOK | wxICON_STOP);
+    if(option==wxNOT_FOUND) wxMessageBox("Please choose the current place (school or office).", "Stop", wxOK | wxICON_STOP);
     else if(dirpath =="") wxMessageBox("Please select the directory.", "Stop", wxOK | wxICON_STOP);
     else if(dirpath != "" && option != wxNOT_FOUND) {
         CreateFiles(dirpath.ToStdString(),option,sec.ToStdString());
         wxMessageBox("Thank you so much for providing all the details. Now, login to begin.", "Let's begin", wxOK);
-        LoginFrame* loginFrame = new LoginFrame("Admin Login");
+        LoginFrame* loginFrame = new LoginFrame(title);
         loginFrame->Show(true);
         this->Close(true);
     }
@@ -737,14 +786,14 @@ void LoginFrame::OnLoginButtonClicked(wxCommandEvent& event){
             break;
         }
         case 1: {
-            mainframe* securesens = new mainframe("Secure-Sens");
+            mainframe* securesens = new mainframe(title);
             securesens->Show(true);
             this->Close(true); // Close the login window
             break;
         }
         default: {
             wxMessageBox("No accounts created before. Creating new account.", "Stop", wxOK | wxICON_STOP);
-            SignupFrame* signupFrame = new SignupFrame("Sign Up");
+            SignupFrame* signupFrame = new SignupFrame(title);
             signupFrame->Show(true);
             this->Close(true); // Close the login window
             break;
@@ -776,13 +825,13 @@ void SignupFrame::OnSignupButtonClicked(wxCommandEvent& event){
     else if (password != repassword) wxMessageBox("Password does not match.", "Password mismatched", wxOK | wxICON_STOP);
     else if (signup(username.ToStdString(), password.ToStdString())) {
         if (check) {
-            SetupFrame* setupframe = new SetupFrame("Getting Started");
+            SetupFrame* setupframe = new SetupFrame(title);
             setupframe->Show();
             this->Close(true);
         }
         else {
             wxMessageBox("Your admin account has been created. Now, log-in again to proceed.", "Sign-up Successful", wxOK);
-            LoginFrame* loginFrame = new LoginFrame("Admin Login");
+            LoginFrame* loginFrame = new LoginFrame(title);
             loginFrame->Show(true);
             this->Close(true);
         }
@@ -792,7 +841,7 @@ void SignupFrame::OnSignupButtonClicked(wxCommandEvent& event){
 
 void mainframe::onaddbutton(wxCommandEvent& event) {
     wxString occupation(getOccupation());
-    inputdetailsframe* inputdetails = new inputdetailsframe(occupation + " details");
+    inputdetailsframe* inputdetails = new inputdetailsframe(title);
     inputdetails->Show();
 }
 void mainframe::onstartbutton(wxCommandEvent& event) {
@@ -801,7 +850,6 @@ void mainframe::onstartbutton(wxCommandEvent& event) {
     if(error!="") wxMessageBox(error, "Error", wxOK | wxICON_STOP);
     else wxMessageBox("The attendance has been successfully marked and updated in the file.", "Attendance Completed", wxOK);
 }
-
 void mainframe::onnewaccbutton(wxCommandEvent& event) {
     SignupFrame* signupFrame = new SignupFrame(title);
     signupFrame->Show(true);
@@ -809,18 +857,20 @@ void mainframe::onnewaccbutton(wxCommandEvent& event) {
 }
 void mainframe::onappointleavebutton(wxCommandEvent& event) {
     LeaveFrame* leaveframe = new LeaveFrame(title);
-
+    leaveframe->Show();
 }
 void mainframe::onchangesectionbutton(wxCommandEvent& event) {
-    ChangeSectionFrame* changesection = new ChangeSectionFrame(title);
+    SetupFrame* changesection = new SetupFrame(title);
     changesection->Show();
-}
-void mainframe::onclosebutton(wxCommandEvent& event) {
     this->Close();
+}
+void mainframe::onclosebutton(wxCommandEvent& event) { this->Close(); }
+
+void LeaveFrame::OnIDSelected(wxCommandEvent& event) {
+    index = event.GetSelection();
 }
 
 void LeaveFrame::OnLeaveButton(wxCommandEvent& event) {
-    wxString ID= IDctrl->GetValue();
     wxDateTime from=datePicker->GetValue();
     wxDateTime to = datePicker2->GetValue();
     int yf = from.GetYear();
@@ -829,7 +879,9 @@ void LeaveFrame::OnLeaveButton(wxCommandEvent& event) {
     int mt = to.GetMonth();
     int df = from.GetDay();
     int dt = to.GetDay();
-    markleave(ID.ToStdString(), int yf, int yt, int mf, int mt, int df, int, dt);
+    if(setLeave(IDS[index], yf, yt, mf, mt, df, dt)) wxMessageBox("Leave marked successfully.", "Leave Marked", wxOK);
+    else wxMessageBox("Unable to mark leave.", "Error", wxOK | wxICON_STOP);
+    this->Close();
 }
 
 void ChangeSectionFrame::onChangeSecButtonClicked(wxCommandEvent& event) {
