@@ -280,9 +280,8 @@ public:
 
 string Add::add(string name, string id, string sec) {
     student = new Student(name, id, sec);
-    camera.open(0);///////////////////////////////////////////////////"C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\VIDEOS\\fs.mp4"
-    if (!camera.isOpened()) return "Unable to access camera.";
-    bool checkfile = face_cascade.load(face_detector); //Load the face cascadeclassifier.
+    camera.open(1);
+    bool checkfile = face_cascade.load(face_detector); //Load the face cascadeclassifier. >> frame 
     if (!checkfile) return "Unable to access face detection file.";
     sec = getSection();
     string filename = "SecureSenseFiles/private/" + sec + csvfile;
@@ -307,6 +306,8 @@ string Add::add(string name, string id, string sec) {
     img_label = getLabel();
     while (true) {
         camera >> frame;
+        if (frame.empty()) return "End of video stream.";
+        imshow("Scanning Face...", frame);
         ++frame_count;
         key = waitKey(1);
         if (key == 27) break;
@@ -323,10 +324,10 @@ string Add::add(string name, string id, string sec) {
         }
         manage_frame_display();
         resize(frame, desired_frame, Size(1500, 800), 0, 0);
-        imshow("Scanning Face...", desired_frame);
     }
     destroyAllWindows();
     CSV_File.close();
+    if (img_count <= 145) return "You have quited from scanning process.";
     update_label();
     if (errormsg != "") return errormsg;
     student->save_student_data(img_label);
@@ -564,8 +565,7 @@ public:
         testSample = imread(sample_image, 0);
         img_width = testSample.cols;
         img_height = testSample.rows;
-        cap.open(0);////////////////////////////////////////
-        if (!cap.isOpened()) return "Error! Camera is not connected properly.";
+        cap.open(0);
         namedWindow(window, 1);
         while (true) {
             FRAME frameobj;
@@ -581,6 +581,7 @@ public:
                 }
                 imshow(window, frameobj.original);
             }
+            else return "End of video stream.";
             int key = waitKey(30);
             if (key == 27) break;
         }
