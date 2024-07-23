@@ -1200,7 +1200,8 @@ here:
     int testLabel = labels[labels.size() - 1];
     images.pop_back();
     labels.pop_back();
-    Ptr<BasicFaceRecognizer> model = EigenFaceRecognizer::create();
+    //Ptr<BasicFaceRecognizer> model = LBPHFaceRecognizer::create();
+    Ptr<LBPHFaceRecognizer> model = LBPHFaceRecognizer::create();
     model->train(images, labels);
     model->write(trainer_name);
     int predictedLabel = model->predict(testSample);
@@ -1542,7 +1543,7 @@ public:
         if (errormsg != "") return errormsg;
         studentAttendance = new Attendance(students);
         if (!face_cascade.load(face_detector)) return "ERROR! Unable to load detection file.";
-        model = EigenFaceRecognizer::create();
+        model = LBPHFaceRecognizer::create();
         const string filename = "F:\\PROJECT\\ConsoleApplication1\\SecureSenseFiles/private/" + section + "_trainer.xml";
         model->read(filename);
         testSample = imread(sample_image, 0);
@@ -1608,7 +1609,7 @@ void FACERECOGNIZER::recognizeFace(FACE& f) {
     resize(f.face, f.face_resized, Size(img_width, img_height), 1.0, 1.0, INTER_CUBIC);
     model->predict(f.face_resized, f.label, f.confidence);
     recognized_student = nullptr; // Ensure recognized_student is reset
-    if (f.label != -1) {
+    if (f.label != -1 && f.confidence<120) {
         for (int i = 0; i < students.size(); i++) {
             if (f.label == students[i].getFaceID()) {
                 recognized_student = new Students(students[i]);
@@ -1633,6 +1634,6 @@ string CaptureFace(string name, string id, string sec) {
 }
 
 int main() {
-    cout << AttendanceWithFaceRecognition();//generate_Trainer("1E"); //CaptureFace("52XCRYPTOO", "555", "1E");
+    cout << AttendanceWithFaceRecognition();// generate_Trainer("1E");  //CaptureFace("52XCRYPTOO", "555", "1E");
     return 0;
 }
