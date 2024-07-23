@@ -202,7 +202,7 @@ here:
     int testLabel = labels[labels.size() - 1];
     images.pop_back();
     labels.pop_back();
-    Ptr<BasicFaceRecognizer> model = EigenFaceRecognizer::create();
+    Ptr<LBPHFaceRecognizer> model = LBPHFaceRecognizer::create();
     model->train(images, labels);
     model->write(trainer_name);
     int predictedLabel = model->predict(testSample);
@@ -268,7 +268,7 @@ class Add {
     Student* student;
     VideoCapture camera;
     CascadeClassifier face_cascade;
-    Mat frame, img_gary, faceImg, desired_frame;  //camera frame
+    Mat frame, img_gary, faceImg;//desired_frame;  //camera frame
     vector<Rect> objects; //The faces coordinates. //Gradation pictures.
     void manage_frame_display();
     void set_instructions();
@@ -281,7 +281,7 @@ public:
 string Add::add(string name, string id, string sec) {
     student = new Student(name, id, sec);
     camera.open(1);
-    bool checkfile = face_cascade.load(face_detector); //Load the face cascadeclassifier. >> frame 
+    bool checkfile = face_cascade.load("SecureSenseFiles/private/haarcascade_frontalface_default.xml");
     if (!checkfile) return "Unable to access face detection file.";
     sec = getSection();
     string filename = "SecureSenseFiles/private/" + sec + csvfile;
@@ -307,7 +307,6 @@ string Add::add(string name, string id, string sec) {
     while (true) {
         camera >> frame;
         if (frame.empty()) return "End of video stream.";
-        imshow("Scanning Face...", frame);
         ++frame_count;
         key = waitKey(1);
         if (key == 27) break;
@@ -322,8 +321,9 @@ string Add::add(string name, string id, string sec) {
             if (errormsg != "") return errormsg;
             if (ret == 0) ++img_count;
         }
+        resize(frame, frame, Size(1024, 768), 0, 0);
         manage_frame_display();
-        resize(frame, desired_frame, Size(1500, 800), 0, 0);
+        imshow("Scanning Face...", frame);
     }
     destroyAllWindows();
     CSV_File.close();
@@ -535,8 +535,7 @@ public:
 };
 
 class FACERECOGNIZER {
-    const string video = "C:\\Users\\Afzaal Khan\\Desktop\\PROJECT 2\\VIDEOS\\rage.mp4";
-    const string sample_image =/* "SecureSenseFiles/images/ (1).jpg";*/ "C:/Users/Afzaal Khan/Desktop/PROJECT/SecureSens/SecureSenseFiles/images/ (1).jpg";
+    const string sample_image ="SecureSenseFiles/images/(1).jpg";// "C:/Users/Afzaal Khan/Desktop/PROJECT/SecureSens/SecureSenseFiles/images/ (1).jpg";
     const string window = "MRKING ATTENDENCE";
     string errormsg = "";
     Ptr<FaceRecognizer> model;
@@ -579,6 +578,7 @@ public:
                     faceobj.highlightFace(frameobj);
                     faceobj.display_Face_Information(frameobj, *recognized_student);
                 }
+                resize(frameobj.original, frameobj.original, Size(1024, 768), 0, 0);
                 imshow(window, frameobj.original);
             }
             else return "End of video stream.";
@@ -624,7 +624,7 @@ void FACERECOGNIZER::recognizeFace(FACE& f) {
     resize(f.face, f.face_resized, Size(img_width, img_height), 1.0, 1.0, INTER_CUBIC);
     model->predict(f.face_resized, f.label, f.confidence);
     recognized_student = nullptr; // Ensure recognized_student is reset
-    if (f.label != -1) {
+    if (f.label != -1 && f.confidence<120) {
         for (int i = 0; i < students.size(); i++) {
             if (f.label == students[i].getFaceID()) {
                 recognized_student = new Students(students[i]);
@@ -671,18 +671,3 @@ bool setLeave(string ID, int yf, int yt, int mf, int mt, int df, int dt) {
     file.close();
     return true;
 }
-/*cout << "\tUsername: ";
-cin >> un;
-pw = "";
-cout << "\tPassword: ";
-while (true) {
-    char c = _getch();
-    if (c == 13) break;
-    else if (c == 8) {
-        pw.pop_back();
-        cout << "\b \b";
-        continue;
-    }
-    pw.push_back(c);
-    cout << '*';
-}*/

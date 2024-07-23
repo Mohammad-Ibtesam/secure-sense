@@ -1200,7 +1200,6 @@ here:
     int testLabel = labels[labels.size() - 1];
     images.pop_back();
     labels.pop_back();
-    //Ptr<BasicFaceRecognizer> model = LBPHFaceRecognizer::create();
     Ptr<LBPHFaceRecognizer> model = LBPHFaceRecognizer::create();
     model->train(images, labels);
     model->write(trainer_name);
@@ -1305,7 +1304,7 @@ string Add::add(string name, string id, string sec) {
             if (errormsg != "") return errormsg;
             if (ret == 0) ++img_count;
         }
-        resize(frame, frame, Size(1500, 800), 0, 0);
+        resize(frame, frame, Size(1024, 768), 0, 0);
         manage_frame_display();
         imshow("Scanning Face...", frame);
     }
@@ -1563,7 +1562,7 @@ public:
                     faceobj.highlightFace(frameobj);
                     faceobj.display_Face_Information(frameobj, *recognized_student);
                 }
-                resize(frameobj.original, frameobj.original, Size(1500, 800), 0, 0);
+                resize(frameobj.original, frameobj.original, Size(1024, 768), 0, 0);
                 imshow(window, frameobj.original);
             }
             else return "End of video stream.";
@@ -1632,6 +1631,22 @@ string CaptureFace(string name, string id, string sec) {
     Add faces;
     return faces.add(name, id, sec);
 }
+
+/*cout << "\tUsername: ";
+cin >> un;
+pw = "";
+cout << "\tPassword: ";
+while (true) {
+    char c = _getch();
+    if (c == 13) break;
+    else if (c == 8) {
+        pw.pop_back();
+        cout << "\b \b";
+        continue;
+    }
+    pw.push_back(c);
+    cout << '*';
+}*/
 
 int main() {
     cout << AttendanceWithFaceRecognition();// generate_Trainer("1E");  //CaptureFace("52XCRYPTOO", "555", "1E");
