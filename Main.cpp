@@ -710,8 +710,7 @@ ChangeSectionFrame::ChangeSectionFrame(const wxString& title) : wxFrame(NULL, wx
 }
 
 void inputdetailsframe::OnSubmitClicked(wxCommandEvent& event) {
-    wxString name = namectrl->GetValue(), id = rnoctrl->GetValue(), sec = secctrl->GetValue();
-    wxString section = sec;
+    wxString name = namectrl->GetValue(), id = rnoctrl->GetValue(), sec = secctrl->GetValue(), sec2 = secctrl->GetValue();
     for (int i = 0; i < name.size(); i++) if (!((name[i] >= 65 && name[i] <= 90) || (name[i] >= 97 && name[i] <= 122) || (name[i] = ' '))) wxMessageBox("Please type fullname properly.", "Stop", wxOK | wxICON_STOP);
     if (name.size()<3) wxMessageBox("Please type fullname.", "Stop", wxOK | wxICON_STOP);
     else if (id == "") wxMessageBox("Please type ID.", "Stop", wxOK | wxICON_STOP);
@@ -729,14 +728,15 @@ void inputdetailsframe::OnSubmitClicked(wxCommandEvent& event) {
                     else s = "Section";
                     wxMessageBox("Please make sure the " + s + " name must be same in order to avoid mismanagement.", "Scanning Multiple Faces", wxOK | wxICON_WARNING);
                 }
-                else {
-                    this->Close();
-                    wxMessageDialog dialog3(this, "Do not close the application. Please wait...", "Processing..");
-                    error = generate_Trainer(section.ToStdString());
-                    dialog3.Close();
-                    if (error != "") wxMessageBox(error, "Error", wxOK | wxICON_STOP);
+                else if (dialog2.ShowModal() == wxID_NO) {
+                    wxString error2(generate_Trainer(sec2.ToStdString()));
+                    if (error2 != "") wxMessageBox(error2, "Error", wxOK | wxICON_STOP);
                     else wxMessageBox("Ready to perform face recognition.", "Done", wxOK);
+                    mainframe* Frame = new mainframe(title);
+                    Frame->Show(true);
+                    this->Close(true);
                 }
+                else;
             } 
         }
     }
@@ -749,9 +749,8 @@ void SetupFrame::Onconfirmclicked(wxCommandEvent& event) {
     else if(dirpath =="") wxMessageBox("Please select the directory.", "Stop", wxOK | wxICON_STOP);
     else if(dirpath != "" && option != wxNOT_FOUND) {
         CreateFiles(dirpath.ToStdString(),option,sec.ToStdString());
-        wxMessageBox("Thank you so much for providing all the details. Now, login to begin.", "Let's begin", wxOK);
-        LoginFrame* loginFrame = new LoginFrame(title);
-        loginFrame->Show(true);
+        mainframe* securesens = new mainframe(title);
+        securesens->Show(true);
         this->Close(true);
     }
 }
@@ -830,9 +829,9 @@ void SignupFrame::OnSignupButtonClicked(wxCommandEvent& event){
             this->Close(true);
         }
         else {
-            wxMessageBox("Your admin account has been created. Now, log-in again to proceed.", "Sign-up Successful", wxOK);
-            LoginFrame* loginFrame = new LoginFrame(title);
-            loginFrame->Show(true);
+            wxMessageBox("Successfully created new account.", "Done", wxOK);
+            mainframe* Frame = new mainframe(title);
+            Frame->Show(true);
             this->Close(true);
         }
     }
@@ -843,6 +842,7 @@ void mainframe::onaddbutton(wxCommandEvent& event) {
     wxString occupation(getOccupation());
     inputdetailsframe* inputdetails = new inputdetailsframe(title);
     inputdetails->Show();
+    this->Close(true);
 }
 void mainframe::onstartbutton(wxCommandEvent& event) {
     this->Close();
@@ -858,6 +858,7 @@ void mainframe::onnewaccbutton(wxCommandEvent& event) {
 void mainframe::onappointleavebutton(wxCommandEvent& event) {
     LeaveFrame* leaveframe = new LeaveFrame(title);
     leaveframe->Show();
+    this->Close(true);
 }
 void mainframe::onchangesectionbutton(wxCommandEvent& event) {
     SetupFrame* changesection = new SetupFrame(title);
@@ -882,6 +883,8 @@ void LeaveFrame::OnLeaveButton(wxCommandEvent& event) {
     if(setLeave(IDS[index], yf, yt, mf, mt, df, dt)) wxMessageBox("Leave marked successfully.", "Leave Marked", wxOK);
     else wxMessageBox("Unable to mark leave.", "Error", wxOK | wxICON_STOP);
     this->Close();
+    mainframe* frame = new mainframe(title);
+    frame->Show();
 }
 
 void ChangeSectionFrame::onChangeSecButtonClicked(wxCommandEvent& event) {

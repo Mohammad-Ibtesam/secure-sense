@@ -19,12 +19,8 @@ using namespace cv::face;
 using namespace std;
 
 string personfile, attendancefile;
-const string DataFolder = "SecureSenseFiles/private/";
-const string RandomImageCSV = "SecureSenseFiles/private/images.csv";
 const string DataFile = "SecureSenseFiles/private/data.txt";
 const string loginfile = "SecureSenseFiles/private/login.txt";
-const string csvfile = "_image.csv", trainerfile = "_trainer.xml";
-const string face_detector = "SecureSenseFiles/private/haarcascade_frontalface_default.xml";
 
 class User {
     string username, password;
@@ -184,7 +180,7 @@ static string read_csv(const string& filename, vector<Mat>& images, vector<int>&
             labels.push_back(atoi(classlabel.c_str()));
         }
     }
-    return "";// to_string(images.size());
+    return "";
 }
 
 string generate_Trainer(string sec) {
@@ -193,8 +189,7 @@ here:
     vector<Mat> images;
     vector<int> labels; // load data
     bool test = true;
-    string filename = "SecureSenseFiles/private/" + sec + csvfile;
-    const string trainer_name = "SecureSenseFiles/private/" + sec + trainerfile;
+    string filename = "SecureSenseFiles/private/" + sec + "_image.csv";
     msg = read_csv(filename, images, labels);
     if (msg != "") return msg;
     if (images.size() < 2) return "Insufficient number of images.";
@@ -202,6 +197,7 @@ here:
     int testLabel = labels[labels.size() - 1];
     images.pop_back();
     labels.pop_back();
+    string trainer_name = "SecureSenseFiles/private/" + sec + "_trainer.xml";
     Ptr<LBPHFaceRecognizer> model = LBPHFaceRecognizer::create();
     model->train(images, labels);
     model->write(trainer_name);
@@ -211,7 +207,7 @@ here:
             test = false;
             goto here;
         }
-        else return "Oops! something went wrong. Please close the applicaion and repeat the process again.\n";
+        else return "Oops! something went wrong. Please restart this application.\n";
     }
     waitKey(0);
     return "";
@@ -284,7 +280,7 @@ string Add::add(string name, string id, string sec) {
     bool checkfile = face_cascade.load("SecureSenseFiles/private/haarcascade_frontalface_default.xml");
     if (!checkfile) return "Unable to access face detection file.";
     sec = getSection();
-    string filename = "SecureSenseFiles/private/" + sec + csvfile;
+    string filename = "SecureSenseFiles/private/" + sec + "_image.csv";
     bool check = true;
     fstream check_file(filename, ios::in);
     if (!check_file) check = false;
@@ -292,7 +288,7 @@ string Add::add(string name, string id, string sec) {
     fstream CSV_File;
     if (!check) {
         CSV_File.open(filename, ios::out);
-        fstream unrec_file(RandomImageCSV, ios::in);
+        fstream unrec_file("SecureSenseFiles/private/images.csv", ios::in);
         if (!CSV_File || !unrec_file) return "Unable to access CSV file.";
         else {
             string line;
@@ -306,7 +302,7 @@ string Add::add(string name, string id, string sec) {
     img_label = getLabel();
     while (true) {
         camera >> frame;
-        if (frame.empty()) return "End of video stream.";
+        if (frame.empty()) return "Please connect your camera.";
         ++frame_count;
         key = waitKey(1);
         if (key == 27) break;
@@ -357,7 +353,7 @@ int Add::save_img(Mat& faceIn, fstream& file, string roll_no, int  img_num, int&
     }
     if (faceIn.cols > 100) {
         resize(faceIn, faceOut, Size(92, 112)); //Resize and Keep a match with the train database.
-        string strname = format("%s %s (%d).jpg", "SecureSenseFiles/images/", roll_no, img_num);
+        string strname = format("%s%s(%d).jpg", "SecureSenseFiles/images/", roll_no, img_num);
         if (label >= -1) file << strname << ";" << label << endl;
         bool isimagewritten = imwrite(strname, faceOut); //save image. Note the file suffix.
         if (!isimagewritten) {
@@ -386,8 +382,8 @@ void Add::manage_frame_display() {
         else frame_text = "Scanning Face...";
     }
     else frame_text = "Scanning Completed!";
-    putText(frame, instructions, Point(10, 70), FONT_HERSHEY_SIMPLEX, 0.65, CV_RGB(0, 153, 153));
-    putText(frame, frame_text, Point(10, 30), FONT_HERSHEY_SIMPLEX, 0.75, CV_RGB(0, 255, 0), 2);
+    putText(frame, instructions, Point(15, 90), FONT_HERSHEY_SIMPLEX, 1.0, CV_RGB(0, 153, 153),2);
+    putText(frame, frame_text, Point(10, 30), FONT_HERSHEY_SIMPLEX, 1.2, CV_RGB(0, 153, 153), 3);
 }
 
 class Person {
@@ -416,7 +412,7 @@ public:
 };
 
 class Attendance {
-    string* mark;//tot
+    string* mark;
     const int frameLimit = 15;
     string errormsg,date, mon, yr = "20";;
     int dd,mmm,yyyy;
@@ -526,16 +522,19 @@ public:
         face = f.graySacleFrame(face_i);
     }
     void highlightFace(FRAME& f) { rectangle(f.original, face_i, CV_RGB(0, 255, 0), 2); }
-    void display_Face_Information(FRAME& f, const Students& student) const {
-        if (label == student.getFaceID())
-            putText(f.original, student.getName(), Point(pos_x + 10, pos_y - 5), FONT_HERSHEY_COMPLEX_SMALL, 1.0, CV_RGB(0, 153, 153), 1);
+    void display_Face_Information(FRAME& f, const Students& student,int freq) const {
+        if (label == student.getFaceID()) {
+            if (freq<=20) putText(f.original, student.getName(), Point(pos_x + 10, pos_y - 5), FONT_HERSHEY_COMPLEX_SMALL, 1.0, CV_RGB(0, 153, 153), 1);
+            else putText(f.original, "Marked Present", Point(pos_x + 10, pos_y - 5), FONT_HERSHEY_COMPLEX_SMALL, 1.0, CV_RGB(0, 153, 153), 1);
+        }
+        else putText(f.original, "Unknown", Point(pos_x + 10, pos_y - 5), FONT_HERSHEY_COMPLEX_SMALL, 1.0, CV_RGB(255, 0, 0), 1);
     }
     friend class FRAME;
     friend class FACERECOGNIZER;
 };
 
 class FACERECOGNIZER {
-    const string sample_image ="SecureSenseFiles/images/(1).jpg";// "C:/Users/Afzaal Khan/Desktop/PROJECT/SecureSens/SecureSenseFiles/images/ (1).jpg";
+    const string sample_image ="SecureSenseFiles/images/(1).jpg";
     const string window = "MRKING ATTENDENCE";
     string errormsg = "";
     Ptr<FaceRecognizer> model;
@@ -557,14 +556,14 @@ public:
         errormsg = setallStudentsData();
         if (errormsg != "") return errormsg;
         studentAttendance = new Attendance(students);
-        if (!face_cascade.load(face_detector)) return "ERROR! Unable to load detection file.";
-        model = EigenFaceRecognizer::create();
+        if (!face_cascade.load("SecureSenseFiles/private/haarcascade_frontalface_default.xml")) return "ERROR! Unable to load detection file.";
+        model = LBPHFaceRecognizer::create();
         const string filename = "SecureSenseFiles/private/" + section + "_trainer.xml";
         model->read(filename);
         testSample = imread(sample_image, 0);
         img_width = testSample.cols;
         img_height = testSample.rows;
-        cap.open(0);
+        cap.open(1);
         namedWindow(window, 1);
         while (true) {
             FRAME frameobj;
@@ -576,12 +575,14 @@ public:
                     FACE faceobj(frameobj, i);
                     recognizeFace(faceobj);
                     faceobj.highlightFace(frameobj);
-                    faceobj.display_Face_Information(frameobj, *recognized_student);
+                    faceobj.display_Face_Information(frameobj, *recognized_student, recognized_faces_freq[faceobj.label]);
                 }
                 resize(frameobj.original, frameobj.original, Size(1024, 768), 0, 0);
+                putText(frameobj.original, "Attendance Check-In", Point(10, 30), FONT_HERSHEY_SIMPLEX, 1, CV_RGB(0, 153, 153), 2);
+                putText(frameobj.original, ":) Smile for the camera ", Point(10, 70), FONT_HERSHEY_SIMPLEX, 0.75, CV_RGB(0, 153, 153), 1);
                 imshow(window, frameobj.original);
             }
-            else return "End of video stream.";
+            else return "Please connect your camera.";
             int key = waitKey(30);
             if (key == 27) break;
         }
@@ -624,7 +625,7 @@ void FACERECOGNIZER::recognizeFace(FACE& f) {
     resize(f.face, f.face_resized, Size(img_width, img_height), 1.0, 1.0, INTER_CUBIC);
     model->predict(f.face_resized, f.label, f.confidence);
     recognized_student = nullptr; // Ensure recognized_student is reset
-    if (f.label != -1 && f.confidence<120) {
+    if (f.label != -1 && f.confidence<=100) {
         for (int i = 0; i < students.size(); i++) {
             if (f.label == students[i].getFaceID()) {
                 recognized_student = new Students(students[i]);
@@ -636,6 +637,7 @@ void FACERECOGNIZER::recognizeFace(FACE& f) {
     if (recognized_student == nullptr) recognized_student = new Students; // Initialize with a default value if no match is found
     f.pos_x = max(f.face_i.tl().x - 10, 0);
     f.pos_y = max(f.face_i.tl().y - 10, 0);
+
 }
 
 string AttendanceWithFaceRecognition() {

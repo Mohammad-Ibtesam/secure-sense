@@ -2,7 +2,7 @@
 #include <iostream>
 
 int main() {
-    cv::VideoCapture cap(0);
+    cv::VideoCapture cap(1);
 
     // Check if the camera opened successfully
     if (!cap.isOpened()) {
@@ -1170,7 +1170,7 @@ bool ChangeSection(string sec) {
 }
 
 static string read_csv(const string& filename, vector<Mat>& images, vector<int>& labels, char separator = ';') {
-    fstream file(filename.c_str(), ios::in);
+    fstream file(filename, ios::in);
     if (!file) return "System is unable to detect CSV file.";
     string line, path, classlabel;
     while (getline(file, line)) {
@@ -1178,7 +1178,7 @@ static string read_csv(const string& filename, vector<Mat>& images, vector<int>&
         getline(liness, path, separator);
         getline(liness, classlabel);
         if (!path.empty() && !classlabel.empty()) {
-            images.push_back(imread(path, 0));
+            images.push_back(imread(/*"F:\\PROJECT\\SecureSens\\" + */path, 0));
             labels.push_back(atoi(classlabel.c_str()));
         }
     }
@@ -1191,8 +1191,8 @@ here:
     vector<Mat> images;
     vector<int> labels; // load data
     bool test = true;
-    string filename = "F:\\PROJECT\\ConsoleApplication1\\SecureSenseFiles/private/" + sec + csvfile;
-    const string trainer_name = "F:\\PROJECT\\ConsoleApplication1\\SecureSenseFiles/private/" + sec + trainerfile;
+    string filename = "F:\\PROJECT\\SecureSens\\SecureSenseFiles\\private\\images.csv";//"F:\\PROJECT\\ConsoleApplication1\\SecureSenseFiles/private/" + sec + csvfile;
+    const string trainer_name = "F:\\PROJECT\\SecureSens\\SecureSenseFiles/private/" + sec + trainerfile;
     msg = read_csv(filename, images, labels);
     if (msg != "") return msg;
     if (images.size() < 2) return "Insufficient number of images.";
@@ -1200,18 +1200,18 @@ here:
     int testLabel = labels[labels.size() - 1];
     images.pop_back();
     labels.pop_back();
-    Ptr<LBPHFaceRecognizer> model = LBPHFaceRecognizer::create();
-    model->train(images, labels);
-    model->write(trainer_name);
-    int predictedLabel = model->predict(testSample);
-    if (predictedLabel != testLabel) {
-        if (test) {
-            test = false;
-            goto here;
-        }
-        else return "Oops! something went wrong. Please close the applicaion and repeat the process again.\n";
-    }
-    waitKey(0);
+    //Ptr<BasicFaceRecognizer> model = EigenFaceRecognizer::create();
+    //model->train(images, labels);
+    //model->write(trainer_name);
+    //int predictedLabel = model->predict(testSample);
+    //if (predictedLabel != testLabel) {
+      //  if (test) {
+        //    test = false;
+          //  goto here;
+        //}
+        //else return "Oops! something went wrong. Please close the applicaion and repeat the process again.\n";
+    //}
+    //waitKey(0);
     return "";
 }
 
@@ -1519,7 +1519,7 @@ public:
 };
 
 class FACERECOGNIZER {
-    const string sample_image =/* "SecureSenseFiles/images/ (1).jpg";*/ "F:\\PROJECT\\ConsoleApplication1/SecureSenseFiles/images/(1).jpg";
+    const string sample_image ="F:\\PROJECT\\ConsoleApplication1/SecureSenseFiles/images/(1).jpg";//"SecureSenseFiles/images/ (1).jpg";
     const string window = "MRKING ATTENDENCE";
     string errormsg = "";//F:\PROJECT\ConsoleApplication1\SecureSenseFiles\images
     Ptr<FaceRecognizer> model;
@@ -1649,6 +1649,6 @@ while (true) {
 }*/
 
 int main() {
-    cout << AttendanceWithFaceRecognition();// generate_Trainer("1E");  //CaptureFace("52XCRYPTOO", "555", "1E");
+    cout << AttendanceWithFaceRecognition();// generate_Trainer("1E");//  CaptureFace("52XCRYPTOO", "555", "1E"); //
     return 0;
 }
