@@ -1,4 +1,4 @@
-## **SecureSens**
+# **SecureSens**
   Marking attendance through traditional methods is a redundant and time-consuming procedure. Therefore, you can optimize this process by our software that marks attendance efficiently through *face recognition technology* and generates attendance sheet accordingly.
 
 
@@ -21,7 +21,7 @@
 
 
 
-## **How to Use:**
+### **How to Use:**
   #### **1. Installation:**
    - Download the zip file from *https://github.com/Mohammad-Ibtesam/secure-sense/blob/main/SecureSens.zip*.
    - Extract at the desired location.
@@ -44,18 +44,18 @@
    - Follow all instructions during scanning process.
    - When scanning is finished, kindly wait for few seconds until a message appears.
   
-  #### ***5. Mark Attendance:***
+  #### **5. Mark Attendance:**
   - Use *Start* button to initiate the attendance marking.
   - Name will be displayed above the head of the recognized person.
   - If the face is not captured before, it will be detected as *Unknown*.
   - When finised, press *Esc* to close the camera and generate attendance sheet accordingly.
   
-  #### ***6. Mark Leave:*** 
+  #### **6. Mark Leave:** 
    - Use the *Appoint Leave* button and provide the required details to mark leave.
 
 
 
-## **Precautions:**
+## **Safeguard:**
 - Follow the above instructions.
 - Avoid manual intervention in application-related files.
 - It is highly recommended to create more than one admin account.
