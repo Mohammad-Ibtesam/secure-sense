@@ -1,7 +1,5 @@
 # **SecureSens**
-  Marking attendance through traditional methods is a redundant and time-consuming procedure. Therefore, you can optimize this process by our software that marks attendance efficiently through *face recognition* and generates attendance sheet accordingly.
-
-
+  Marking attendance through traditional methods is a redundant and time-consuming procedure. Therefore, you can optimize this process by our software that marks attendance efficiently through *face recognition* and generates attendance sheet accordingly.__
 
 ### **Key Features:**
   - Fast Performance
@@ -17,9 +15,7 @@
   - Advanced *LBPH Face Recognition Algorithm*
   - Face Recognition Accuracy Rate of 90.80%
   - Realtime Multi-Face Recognition
-  - Versatile for both Schools and Offices
-
-
+  - Versatile for both Schools and Offices\n
 
 ### **How to Use:**
   #### **1. Installation:**
