@@ -1,9 +1,9 @@
-## **About:**
-Marking attendance using traditional methods is a redundant and time-consuming procedure. To optimize this process, we developed ***SecureSens***, an application that efficiently marks attendance using *face recognition technology*.
+## **SecureSens**
+  Marking attendance through traditional methods is a redundant and time-consuming procedure. Therefore, you can optimize this process by our software that marks attendance efficiently through *face recognition technology* and generates attendance sheet accordingly.
 
 
 
-## **Key Features:**
+### **Key Features:**
   - Fast Performance
   - User-Friendly Interface
   - Low Storage Requirements
@@ -22,37 +22,46 @@ Marking attendance using traditional methods is a redundant and time-consuming p
 
 
 ## **How to Use:**
-  #### ***1. Installation:***
+  #### **1. Installation:**
    - Download the zip file from *https://github.com/Mohammad-Ibtesam/secure-sense/blob/main/SecureSens.zip*.
    - Extract at the desired location.
   
-  #### ***2. Set Up:*** 
-   - Open the **SecureSens** application.
+  #### **2. Set Up:** 
+   - After the installation, open the *SecureSens* application.
    - Sign-up to create your first admin account.
    - After providing other details, click *Browse* and choose the directory for attendance files.
-   - Now, the application is ready to use.
+   - Now, the application is ready to use in your computer.
   
-  #### ***3. Camera Setup:***
+  #### **3. Camera Setup:**
    - Open the *device manager* and ensure the installation of  camera driver.
    - If the driver is not installed, download the most suitable one for your computer.
    - Use high quality *USB Facial Recognition Camera* for better performance.
-   - Before capturing face or marking attendance, please make sure to connect your camera properly with USB port on your computer.
+   - Before capturing any person's face or marking attendance, connect the camera properly with USB port on your computer.
   
-  #### ***4. Capture Faces:***
- Use *Capture New Face* button for face scanning. You can capture faces all at once or time-to-time. Follow all instructions and wait for few seconds until a message appears.
+  #### **4. Capture Faces:**  
+   - Use *Capture New Face* button to initiate face scanning.
+   - You can capture faces all at once or time-to-time.
+   - Follow all instructions during scanning process.
+   - When scanning is finished, kindly wait for few seconds until a message appears.
   
-  #### ***5. Mark Attendance:*** Use *Start* button to initiate the attendance marking.
+  #### ***5. Mark Attendance:***
+  - Use *Start* button to initiate the attendance marking.
+  - Name will be displayed above the head of the recognized person.
+  - If the face is not captured before, it will be detected as *Unknown*.
+  - When finised, press *Esc* to close the camera and generate attendance sheet accordingly.
   
   #### ***6. Mark Leave:*** 
-Use the *Appoint Leave* button to mark leave.
+   - Use the *Appoint Leave* button and provide the required details to mark leave.
 
 
 
 ## **Precautions:**
+- Follow the above instructions.
 - Avoid manual intervention in application-related files.
 - It is highly recommended to create more than one admin account.
-- Connect the camera properly with USB port.
-- Ensure whether the camera driver is installed or not.
-- 
+- If the password is forgotten, kindly email us for assistance.
+- Ensure that the camera driver is properly installed on your computer.
+- Connect the camera properly with USB port before capturing face or marking attendance.
 - After the scanning is finished, do not close the application before the message appears.
-- If the password is forgotten, email us at: *ibtesam12082005@gmail.com*.
+
+For any query, contact us at: *ibtesam12082005@gmail.com*
