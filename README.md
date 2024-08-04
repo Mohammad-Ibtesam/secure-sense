@@ -55,7 +55,7 @@
 
 
 
-## **Safeguard:**
+### **Safeguard:**
 - Follow the above instructions.
 - Avoid manual intervention in application-related files.
 - It is highly recommended to create more than one admin account.
