@@ -22,9 +22,9 @@ Marking attendance using traditional methods is a redundant and time-consuming p
 
 
 ## **How to Use:**
-> ### ***1. Installation:***
->> - Download the zip file from *https://github.com/Mohammad-Ibtesam/secure-sense/blob/main/SecureSens.zip*.
->> - Extract at the desired location.
+>### ***1. Installation:***
+>>- Download the zip file from *https://github.com/Mohammad-Ibtesam/secure-sense/blob/main/SecureSens.zip*.
+>>- Extract at the desired location.
 
     ### ***2. Set Up:*** 
         - Open the **SecureSens** application.
