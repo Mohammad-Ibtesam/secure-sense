@@ -22,20 +22,21 @@ Marking attendance using traditional methods is a redundant and time-consuming p
 
 
 ## **How to Use:**
->### ***1. Installation:***
->>- Download the zip file from *https://github.com/Mohammad-Ibtesam/secure-sense/blob/main/SecureSens.zip*.
->>- Extract at the desired location.
-
-    ### ***2. Set Up:*** 
-        - Open the **SecureSens** application.
-        - Sign-up to create your first admin account.
-        - After providing other details, click *Browse* and choose the directory for attendance files.
-        - Now, the application is ready to use.
+  ### ***1. Installation:***
+   - Download the zip file from *https://github.com/Mohammad-Ibtesam/secure-sense/blob/main/SecureSens.zip*.
+   - Extract at the desired location.
   
-    ### ***3. Camera Installation:*** 
-        - Connect the camera properly with the USB port on your computer.
-        - Use high quality camera for better perforamnce.
-      - 
+  ### ***2. Set Up:*** 
+   - Open the **SecureSens** application.
+   - Sign-up to create your first admin account.
+   - After providing other details, click *Browse* and choose the directory for attendance files.
+   - Now, the application is ready to use.
+  
+  ### ***3. Camera Setup:***
+   - Open the *device manager* and ensure the installation of  camera driver.
+   - If the driver is not installed, download the most suitable one for your computer.
+   - Use high quality *USB Facial Recognition Camera* for better performance.
+   - Before capturing face or marking attendance, please make sure to connect your camera properly with USB port on your computer.
   
   ### ***4. Capture Faces:*** Use *Capture New Face* button for face scanning. You can capture faces all at once or time-to-time. Follow all instructions and wait for few seconds until a message appears.
   
@@ -49,7 +50,7 @@ Marking attendance using traditional methods is a redundant and time-consuming p
 - Avoid manual intervention in application-related files.
 - It is highly recommended to create more than one admin account.
 - Connect the camera properly with USB port.
-- Ensure whether the camera driver is already installed or not.
+- Ensure whether the camera driver is installed or not.
 - 
 - After the scanning is finished, do not close the application before the message appears.
 - If the password is forgotten, email us at: *ibtesam12082005@gmail.com*.
