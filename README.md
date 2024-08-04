@@ -1,5 +1,5 @@
 # **SecureSens**
-  Marking attendance through traditional methods is a redundant and time-consuming procedure. Therefore, you can optimize this process by our software that marks attendance efficiently through *face recognition* and generates attendance sheet accordingly.\n\n
+  Marking attendance through traditional methods is a redundant and time-consuming procedure. Therefore, you can optimize this process by our software that marks attendance efficiently through *face recognition* and generates attendance sheet accordingly.<br><br>
 
 ### **Key Features:**
   - Fast Performance
