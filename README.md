@@ -22,27 +22,29 @@ Marking attendance using traditional methods is a redundant and time-consuming p
 
 
 ## **How to Use:**
-  ### ***1. Installation:***
+  #### ***1. Installation:***
    - Download the zip file from *https://github.com/Mohammad-Ibtesam/secure-sense/blob/main/SecureSens.zip*.
    - Extract at the desired location.
   
-  ### ***2. Set Up:*** 
+  #### ***2. Set Up:*** 
    - Open the **SecureSens** application.
    - Sign-up to create your first admin account.
    - After providing other details, click *Browse* and choose the directory for attendance files.
    - Now, the application is ready to use.
   
-  ### ***3. Camera Setup:***
+  #### ***3. Camera Setup:***
    - Open the *device manager* and ensure the installation of  camera driver.
    - If the driver is not installed, download the most suitable one for your computer.
    - Use high quality *USB Facial Recognition Camera* for better performance.
    - Before capturing face or marking attendance, please make sure to connect your camera properly with USB port on your computer.
   
-  ### ***4. Capture Faces:*** Use *Capture New Face* button for face scanning. You can capture faces all at once or time-to-time. Follow all instructions and wait for few seconds until a message appears.
+  #### ***4. Capture Faces:***
+ Use *Capture New Face* button for face scanning. You can capture faces all at once or time-to-time. Follow all instructions and wait for few seconds until a message appears.
   
-  ### ***5. Mark Attendance:*** Use *Start* button to initiate the attendance marking.
+  #### ***5. Mark Attendance:*** Use *Start* button to initiate the attendance marking.
   
-  ## ***6. Mark Leave:*** Use the *Appoint Leave* button to mark leave.
+  #### ***6. Mark Leave:*** 
+Use the *Appoint Leave* button to mark leave.
 
 
 
