@@ -15,19 +15,17 @@
   - Advanced *LBPH Face Recognition Algorithm*
   - Face Recognition Accuracy Rate of 90.80%
   - Realtime Multi-Face Recognition
-  - Versatile for both Schools and Offices\n
-
+  - Versatile for both Schools and Offices<br><br>
 ### **How to Use:**
   #### **1. Installation:**
    - Download the zip file from *https://github.com/Mohammad-Ibtesam/secure-sense/blob/main/SecureSens.zip*.
-   - Extract at the desired location.
+   - Extract at the desired location.<br>
   
   #### **2. Set Up:** 
    - After the installation, open the *SecureSens* application.
    - Sign-up to create your first admin account.
    - After providing other details, click *Browse* and choose the directory for attendance files.
-   - Now, the application is ready to use in your computer.
-  
+   - Now, the application is ready to use in your computer.<br>
   #### **3. Camera Setup:**
    - Open the *device manager* and ensure the installation of  camera driver.
    - If the driver is not installed, download the most suitable one for your computer.
