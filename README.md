@@ -3,17 +3,18 @@
 ### **Key Features:**
   - Fast Performance
   - User-Friendly Interface
+  - Secure and Virus-free 
   - Low Storage Requirements
   - Offline Functionality
-  - Easy Installation on any Device
+  - Easy Installation
+  - Compatibility 
   - Effective Data Management
-  - Secure Login System
   - Prevents Unauthorized Access
   - Allows Multiple Admin Accounts
-  - Leave Marking
   - Advanced *LBPH Face Recognition Algorithm*
   - Face Recognition Accuracy Rate of 90.80%
   - Realtime Multi-Face Recognition
+  - Leave Marking
   - Versatile for both Schools and Offices<br><br><br>
 ### **How to Use:**
   #### **1. Installation:**
