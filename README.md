@@ -9,6 +9,7 @@
   - Easy Installation
   - Compatibility 
   - Effective Data Management
+  - Customized theme for brand alignment 
   - Prevents Unauthorized Access
   - Allows Multiple Admin Accounts
   - Advanced *LBPH Face Recognition Algorithm*
